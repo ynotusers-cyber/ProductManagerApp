@@ -1,0 +1,10 @@
+{
+  "appId": "com.productmanager.app",
+  "appName": "YNOT",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "http",
+    "cleartext": true,
+    "allowNavigation": ["192.168.*.*"]
+  }
+}

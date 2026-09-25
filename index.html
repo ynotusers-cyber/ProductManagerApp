@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/app_logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light only" />
+    <meta name="theme-color" content="#1565c0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <title>YNOT</title>
+    <style>
+      /* Splash screen — matches the app's industrial blue/white theme
+         (this is the very first paint, before any React/theme.js code has
+         even run, so it intentionally uses the same default blue as
+         src/index.css / src/utils/theme.js rather than pulling a CSS
+         variable that isn't defined yet). */
+      #splash-screen {
+        /* Hidden from view — the app still boots and initializes the
+           database exactly as before (App.jsx's initDB() call and this
+           script's own hide-when-ready logic are both unrelated to CSS
+           visibility and keep running normally). This just stops the
+           logo/dots overlay from being shown on screen while that
+           happens; the body's own background (var(--app-bg) in
+           index.css) shows instead, so there's no white flash either. */
+        display: none;
+        position: fixed; inset: 0; z-index: 9999;
+        background: linear-gradient(160deg, #0d3f74 0%, #1565c0 55%, #1e79d6 100%);
+        flex-direction: column;
+        align-items: center; justify-content: center;
+        transition: opacity 0.6s ease;
+      }
+      #splash-screen.hidden { opacity: 0; pointer-events: none; }
+      #splash-screen img {
+        width: 120px; height: 120px;
+        border-radius: 28px;
+        background: #ffffff;
+        box-shadow: 0 0 50px rgba(255,255,255,0.35), 0 20px 50px rgba(13,63,116,0.45);
+        animation: logoPulse 2s ease-in-out infinite;
+      }
+      #splash-screen .s-title {
+        margin-top: 22px;
+        color: #ffffff;
+        font-family: 'Inter', Arial, sans-serif;
+        font-size: 22px; font-weight: 800;
+        letter-spacing: 5px;
+      }
+      #splash-screen .s-sub {
+        color: #cfe3fa;
+        font-family: 'Inter', Arial, sans-serif;
+        font-size: 11px; letter-spacing: 3px;
+        margin-top: 5px;
+      }
+      #splash-screen .s-dots {
+        display: flex; gap: 8px; margin-top: 26px;
+      }
+      #splash-screen .s-dots span {
+        width: 9px; height: 9px;
+        background: #ffffff; border-radius: 50%;
+        animation: dotBounce 1.3s infinite ease-in-out;
+        opacity: 0.3;
+      }
+      #splash-screen .s-dots span:nth-child(2) { animation-delay: 0.2s; }
+      #splash-screen .s-dots span:nth-child(3) { animation-delay: 0.4s; }
+      @keyframes logoPulse {
+        0%,100% { transform: scale(1);     box-shadow: 0 0 50px rgba(255,255,255,0.25), 0 20px 50px rgba(13,63,116,0.4); }
+        50%      { transform: scale(1.07); box-shadow: 0 0 80px rgba(255,255,255,0.45), 0 24px 60px rgba(13,63,116,0.55); }
+      }
+      @keyframes dotBounce {
+        0%,80%,100% { transform: translateY(0);    opacity: 0.3; }
+        40%          { transform: translateY(-12px); opacity: 1;   }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="splash-screen">
+      <img src="/app_logo.png" alt="YNOT" />
+      <div class="s-title">PRODEX POS</div>
+      <div class="s-sub">POS &nbsp;·&nbsp; PRODUCT MANAGEMENT</div>
+      <div class="s-dots"><span></span><span></span><span></span></div>
+    </div>
+    <div id="root"></div>
+    <jeep-sqlite></jeep-sqlite>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      (function() {
+        var splash = document.getElementById('splash-screen');
+        var root   = document.getElementById('root');
+        var gone   = false;
+        function hideSplash() {
+          if (gone) return; gone = true;
+          splash.classList.add('hidden');
+          setTimeout(function() { if (splash && splash.parentNode) splash.parentNode.removeChild(splash); }, 700);
+        }
+        var obs = new MutationObserver(function() {
+          if (root.childElementCount > 0) { hideSplash(); obs.disconnect(); }
+        });
+        obs.observe(root, { childList: true, subtree: true });
+        setTimeout(hideSplash, 8000);
+      })();
+    </script>
+  </body>
+</html>
