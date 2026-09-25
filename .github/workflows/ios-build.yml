@@ -10,8 +10,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          sparse-checkout: .
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -19,17 +17,23 @@ jobs:
           node-version: 20
 
       - name: Install Dependencies
-        run: npm install
+        run: |
+          cd $GITHUB_WORKSPACE
+          npm install
 
       - name: Build Web Project
-        run: npm run build
+        run: |
+          cd $GITHUB_WORKSPACE
+          npm run build
 
       - name: Sync Capacitor iOS
-        run: npx cap sync ios
+        run: |
+          cd $GITHUB_WORKSPACE
+          npx cap sync ios
 
       - name: Build iOS App Xcode
         run: |
-          cd ios/App
+          cd $GITHUB_WORKSPACE/ios/App
           xcodebuild -workspace *.xcworkspace \
                      -scheme App \
                      -sdk iphoneos \
@@ -40,13 +44,13 @@ jobs:
 
       - name: Create Unsigned IPA
         run: |
-          mkdir -p ios/App/build/Payload
-          mv ios/App/build/Build/Products/Release-iphoneos/*.app ios/App/build/Payload/
-          cd ios/App/build
+          cd $GITHUB_WORKSPACE/ios/App/build
+          mkdir -p Payload
+          mv Build/Products/Release-iphoneos/*.app Payload/
           zip -r ProductManager-Unsigned.ipa Payload
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: capacitor-ios-ipa
-          path: ios/App/build/ProductManager-Unsigned.ipa
+          path: ${{ github.workspace }}/ios/App/build/ProductManager-Unsigned.ipa
